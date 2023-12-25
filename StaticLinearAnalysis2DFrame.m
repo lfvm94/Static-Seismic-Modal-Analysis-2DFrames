@@ -176,7 +176,7 @@ if plotAnalysisResults==1
      plotpar=[2 1 0];
      eldraw2(Ex,Ey,plotpar);
 
-       %----Deformed mesh----%
+       %-----Deformed mesh-----%
 
      plotpar=[1 2 1];
      eldisp2(Ex,Ey,Ed,plotpar,100);  

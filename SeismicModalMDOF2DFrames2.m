@@ -1,8 +1,8 @@
-function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF2DFrames2...
-    (coordxy,A,unitWeightEl,qbarxy,Edof,bc,E,I,ni,nf,Psacel,g,modal)
+function [Sd,fmaxDOF,Mgl,Kgl,T,La,Egv,Ma]=SeismicModalMDOF2DFrames2...
+    (coordxy,A,unitWeightEl,qbarxy,Edof,bc,E,I,ni,nf,DS,g,modal)
 % SYNTAX : 
-% [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF2DFrames2...
-%  (coordxy,A,unitWeightEl,qbarxy,Edof,bc,E,I,ni,nf,Psacel,g,modal)
+% [Sd,fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF2DFrames2...
+%  (coordxy,A,unitWeightEl,qbarxy,Edof,bc,E,I,ni,nf,DS,g,modal)
 %---------------------------------------------------------------------
 %    PURPOSE
 %     To compute the global stiffness matrix of a plane frame as well as
@@ -18,7 +18,9 @@ function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF2DFrames2...
 %
 %            bc:                Boundary condition array
 %
-%            Psacel:            Pseudo-acceleration at the base
+%            DS:            	Design Spectrum:
+%                               (1) Eurocode EC8
+%                               (2) Mexican code NTC-17
 %
 %            modal:             Mode of vibration of interest:
 %                               [mode-1,mode-2,...] -> The equivalent 
@@ -42,7 +44,9 @@ function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF2DFrames2...
 %                               and the second column the the loads
 %                               distributed in the local Y' direction.
 %
-%    OUTPUT: La :               Modal of vibration for each DOF. 
+%    OUTPUT: Sd:                Spectrum Design acceleration
+%
+%            La :               Modal of vibration for each DOF. 
 %                               Size: Nmodals x 1
 %
 %            Egv:               DOF's eigenvalues: NDOF x Nmodals
@@ -54,6 +58,8 @@ function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF2DFrames2...
 %
 %            Mgl:               Global Mass matrix
 %            Kgl:               Global Stiffness matrix
+%
+%            Ma:                Modal mass constribution of every DOF
 %
 %--------------------------------------------------------------------
 
@@ -84,5 +90,5 @@ for i=1:nbars
 end 
 
 %% Modal analysis
-[fmaxDOF,T,La,Egv]=ModalsMDOF2DFrames2(Mgl,Kgl,bc,Psacel,modal);
+[Sd,fmaxDOF,T,La,Egv,Ma]=ModalsMDOF2DFrames2(Mgl,Kgl,bc,DS,modal);
 

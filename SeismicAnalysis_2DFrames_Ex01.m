@@ -153,31 +153,15 @@ modal=1;
 %% Seismic response spectrum from the CFE-15
 
 g=981; % gravity acceleration
-Fsit=2.4; FRes=3.8; % Factores de sitio y de respuesta
-a0_tau=200; % cm/seg^2
-
-ro=0.8; % Redundance factor
-alf=0.9; % Irregularity factor
-Q=4; % Seismic behaviour factor
-
-Ta=0.1;
-Tb=0.6;
-Te=0.5; % Structure's period
-k=1.5; % Design spectrum slope
-Qp=1+(Q-1)*sqrt(Te/(k*Tb)); % Ductility factor
-
-Ro=2.5; % Over-resistance index
-R=Ro+1-sqrt(Te/Ta); % Over-resistance factor
-
-sa=-a0_tau*Fsit*FRes/(R*Qp*alf*ro); % Reduced pseudo-acceleration (cm/seg^2)
 
 %% Modal analysis
 pvconc=0.0024; % unit weight of concrete
 unitWeightElm=zeros(nbars,1)+pvconc;
 
 % Consistent mass method
-[fmaxDOF,Mglobal,Kglobal,T,La,Egv]=SeismicModalMDOF2DFrames2...
-(coordxy,A,unitWeightElm,qbarxy,Edof,bc,E,I,ni,nf,sa,g,modal);
+DS=1;
+[Sd,fmaxDOF,Mglobal,Kglobal,T,La,Egv,Ma]=SeismicModalMDOF2DFrames2...
+(coordxy,A,unitWeightElm,qbarxy,Edof,bc,E,I,ni,nf,DS,g,modal);
 
 % Considering the equivalent seismic loads for a structural analysis
 fglobal=fmaxDOF;
@@ -204,7 +188,7 @@ if length(modal)==1 % If only one modal was entered
     NotaFreq=strcat('Freq(Hz)= ',FreqText);
     text(50,10,NotaFreq);
 end
-%% Plot of the seismic structural reponse for the first 10 modals
+%% Plot of the seismic structural reponse for the first 10 modes
 widthstruc=max(coordxy(:,1));
 heightstruc=max(coordxy(:,2));
 
@@ -219,8 +203,8 @@ hold on
 for i=1:5
     
     % Modal static analysis - Consistent mass method
-    [fmaxDOF,Mglobal,Kglobal,T,La,Egv]=SeismicModalMDOF2DFrames2...
-    (coordxy,A,unitWeightElm,qbarxy,Edof,bc,E,I,ni,nf,sa,g,i);
+    [Sd,fmaxDOF,Mglobal,Kglobal,T,La,Egv,Ma]=SeismicModalMDOF2DFrames2...
+    (coordxy,A,unitWeightElm,qbarxy,Edof,bc,E,I,ni,nf,DS,g,i);
 
     % Static structural analysis with seismic forces
     [Ugl,reactions,Ex,Ey,esbarsnormal,esbarsshear,esbarsmoment]=...
@@ -229,7 +213,7 @@ for i=1:5
 
     Ext=Ex+(i-1)*(widthstruc+150);
     eldraw2(Ext,Ey,[2 3 1]);
-    Edb=extract(Edof,Ugl);
+    Edb=extract(Edof,Egv(:,i));
     eldisp2(Ext,Ey,Edb,[1 2 2]);
     FreqText=num2str(Freq(i));
     NotaFreq=strcat('Frec(Hz)= ',FreqText);
@@ -240,9 +224,9 @@ end
 % Last 5 modals at the bottom of the plot
 Eyt=Ey-(heightstruc+200);
 for i=6:10
-    % Consistent mass method
-    [fmaxDOF,Mglobal,Kglobal,T,La,Egv]=SeismicModalMDOF2DFrames2...
-    (coordxy,A,unitWeightElm,qbarxy,Edof,bc,E,I,ni,nf,sa,g,i);
+    % Modal static analysis - Consistent mass method
+    [Sd,fmaxDOF,Mglobal,Kglobal,T,La,Egv,Ma]=SeismicModalMDOF2DFrames2...
+    (coordxy,A,unitWeightElm,qbarxy,Edof,bc,E,I,ni,nf,DS,g,i);
 
     %% Static structural analysis with seismic forces
     [Ugl,reactions,Ex,Ey,esbarsnormal,esbarsshear,esbarsmoment]=...
@@ -251,7 +235,7 @@ for i=6:10
 
     Ext=Ex+(i-6)*(widthstruc+150);
     eldraw2(Ext,Eyt,[2 3 1]);
-    Edb=extract(Edof,Ugl);
+    Edb=extract(Edof,Egv(:,i));
     eldisp2(Ext,Eyt,Edb,[1 2 2]);
     FreqText=num2str(Freq(i));
     NotaFreq=strcat('Frec(Hz)= ',FreqText);
