@@ -10,9 +10,6 @@ function [Sd,FmaxMDOF,Te,lambda,fi,Ma]=ModalsMDOF2DFrames2(M,K,bc,DS,mode)
 %
 %            bc:                Boundary condition array
 %
-%            Sa:                Design Spectrum 
-%                               (1) from the Eurocode EC8
-%
 %            mode:              Mode of vibration of interest:
 %                               [mode-1,mode-2,...] -> The equivalent 
 %                                    inertial forces are computed with the
@@ -52,6 +49,7 @@ function [Sd,FmaxMDOF,Te,lambda,fi,Ma]=ModalsMDOF2DFrames2(M,K,bc,DS,mode)
 for i=1:nmodes
     [factor,ifactor]=max(abs(fi(:,i))); % Eigenvectors - vibration modals
     factor=factor*sign(fi(ifactor,i));
+    fi(:,i)=fi(:,i)./factor;
 end
 
 % Circular frequencies
@@ -81,7 +79,8 @@ for i=1:nmodes
     
     Ln=fmaxn*vector1'; 
     rn=Ln/Mn; % Modal participation factor
-    fmax(:,i)=rn*Sd;
+    
+    fmax(:,i)=-fmaxn.*vector1*Sd; % fmax(:,i)=rn*Sd;
     
     Ma(i)=rn^2*Mn; % Effective modal mass
 end

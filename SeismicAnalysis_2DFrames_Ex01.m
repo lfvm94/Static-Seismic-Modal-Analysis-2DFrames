@@ -150,7 +150,7 @@ end
 
 modal=1;
 
-%% Seismic response spectrum from the CFE-15
+%% Seismic response spectrum
 
 g=981; % gravity acceleration
 
